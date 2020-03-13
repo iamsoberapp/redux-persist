@@ -65,6 +65,7 @@ declare module "redux-persist" {
   }
 
   export interface Persistor {
+    flush(): Promise<void>;
     purge(keys?: string[]): void;
     rehydrate<State>(incoming: State, options: RehydrateOptions): undefined;
     pause(): void;

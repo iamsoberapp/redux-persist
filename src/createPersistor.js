@@ -64,6 +64,41 @@ export default function createPersistor (store, config) {
     lastState = state
   })
 
+  function flush() {
+    return new Promise((resolve, reject) => {
+      try {
+        let state = store.getState()
+
+        stateIterator(state, (subState, key) => {
+          if (!passWhitelistBlacklist(key)) return
+          if (stateGetter(lastState, key) === stateGetter(state, key)) return
+          if (storesToProcess.indexOf(key) !== -1) return
+          storesToProcess.push(key)
+        })
+
+        const len = storesToProcess.length
+
+        // time iterator (read: debounce)
+        if (timeIterator === null) {
+          timeIterator = setInterval(() => {
+            if (storesToProcess.length === 0) {
+              clearInterval(timeIterator)
+              timeIterator = null
+              resolve();
+            } else {
+              let key = storesToProcess.shift()
+              let storageKey = createStorageKey(key)
+              let endState = transforms.reduce((subState, transformer) => transformer.in(subState, key), stateGetter(store.getState(), key))
+              if (typeof endState !== 'undefined') storage.setItem(storageKey, serializer(endState), warnIfSetError(key))
+            }
+          }, debounce)
+        }
+      } catch (ex) {
+        reject(ex);
+      }
+    });
+  }
+
   function passWhitelistBlacklist (key) {
     if (whitelist && whitelist.indexOf(key) === -1) return false
     if (blacklist.indexOf(key) !== -1) return false
@@ -96,6 +131,7 @@ export default function createPersistor (store, config) {
 
   // return `persistor`
   return {
+    flush: flush,
     rehydrate: adhocRehydrate,
     pause: () => { paused = true },
     resume: () => { paused = false },
