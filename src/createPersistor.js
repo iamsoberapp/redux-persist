@@ -2,7 +2,6 @@ import { KEY_PREFIX, REHYDRATE } from './constants'
 import createAsyncLocalStorage from './defaults/asyncLocalStorage'
 import purgeStoredState from './purgeStoredState'
 import stringify from 'json-stringify-safe'
-
 export default function createPersistor (store, config) {
   // defaults
   const serializer = config.serialize === false ? (data) => data : defaultSerializer
@@ -28,6 +27,7 @@ export default function createPersistor (store, config) {
   // initialize stateful values
   let lastState = stateInit
   let paused = false
+  let pausedForFlush = false;
   let storesToProcess = []
   let timeIterator = null
 
@@ -48,7 +48,8 @@ export default function createPersistor (store, config) {
     // time iterator (read: debounce)
     if (timeIterator === null) {
       timeIterator = setInterval(() => {
-        if ((paused && len === storesToProcess.length) || storesToProcess.length === 0) {
+        // If pausedForFlush, bail immediately as flush() below will finish working storesToProcess.
+        if (pausedForFlush || (paused && len === storesToProcess.length) || storesToProcess.length === 0) {
           clearInterval(timeIterator)
           timeIterator = null
           return
@@ -77,22 +78,32 @@ export default function createPersistor (store, config) {
         })
 
         const len = storesToProcess.length
+        let waitInterval;
 
-        // time iterator (read: debounce)
-        if (timeIterator === null) {
-          timeIterator = setInterval(() => {
-            if (storesToProcess.length === 0) {
-              clearInterval(timeIterator)
-              timeIterator = null
-              resolve();
-            } else {
-              let key = storesToProcess.shift()
-              let storageKey = createStorageKey(key)
-              let endState = transforms.reduce((subState, transformer) => transformer.in(subState, key), stateGetter(store.getState(), key))
-              if (typeof endState !== 'undefined') storage.setItem(storageKey, serializer(endState), warnIfSetError(key))
-            }
-          }, debounce)
-        }
+        waitInterval = setInterval(() => {
+          // Queue processing by subscribe() has completed or been stopped by pausedForFlush.
+          if (timeIterator === null) {
+            clearInterval(waitInterval);
+            waitInterval = null;
+
+            timeIterator = setInterval(() => {
+              if (storesToProcess.length === 0) {
+                clearInterval(timeIterator)
+                timeIterator = null;
+                resolve();
+                return;
+              } else {
+                let key = storesToProcess.shift()
+                let storageKey = createStorageKey(key)
+                let endState = transforms.reduce((subState, transformer) => transformer.in(subState, key), stateGetter(store.getState(), key))
+                if (typeof endState !== 'undefined') storage.setItem(storageKey, serializer(endState), warnIfSetError(key))
+              }
+            }, debounce)
+          } else {
+            // No-op, wait for the next processing interval and try again.
+          }
+        }, 1000);
+
       } catch (ex) {
         reject(ex);
       }
@@ -133,6 +144,7 @@ export default function createPersistor (store, config) {
   return {
     flush: flush,
     rehydrate: adhocRehydrate,
+    pauseForFlush: () => { pausedForFlush = true },
     pause: () => { paused = true },
     resume: () => { paused = false },
     purge: (keys) => purgeStoredState({storage, keyPrefix}, keys)
