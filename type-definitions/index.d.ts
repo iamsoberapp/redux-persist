@@ -69,6 +69,7 @@ declare module "redux-persist" {
     purge(keys?: string[]): void;
     rehydrate<State>(incoming: State, options: RehydrateOptions): undefined;
     pause(): void;
+    pauseForFlush(): void;
     resume(): void;
   }
 
