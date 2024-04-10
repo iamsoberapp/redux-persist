@@ -31,7 +31,7 @@ export default function createPersistor (store, config) {
   let storesToProcess = []
   let timeIterator = null
 
-  store.subscribe(() => {
+  const unsubscribe = store.subscribe(() => {
     if (paused) return
 
     let state = store.getState()
@@ -140,6 +140,15 @@ export default function createPersistor (store, config) {
     return `${keyPrefix}${key}`
   }
 
+  function stop() {
+    if(process.env.NODE_ENV !== 'production') {
+        console.log("Persistor unsubscribing from store");
+    }
+    pauseForFlush();
+    flush();
+    unsubscribe();
+  }
+
   // return `persistor`
   return {
     flush: flush,
@@ -147,7 +156,8 @@ export default function createPersistor (store, config) {
     pauseForFlush: () => { pausedForFlush = true },
     pause: () => { paused = true },
     resume: () => { paused = false },
-    purge: (keys) => purgeStoredState({storage, keyPrefix}, keys)
+    purge: (keys) => purgeStoredState({storage, keyPrefix}, keys),
+    stop: stop
   }
 }
 

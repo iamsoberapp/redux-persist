@@ -71,6 +71,7 @@ declare module "redux-persist" {
     pause(): void;
     pauseForFlush(): void;
     resume(): void;
+    stop(): void;
   }
 
   export type StateReconciler<PrevState, InboundState, NextState> = (state: PrevState, inboundState: InboundState, reducedState: any, log: boolean) => NextState;
