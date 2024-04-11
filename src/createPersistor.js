@@ -144,9 +144,12 @@ export default function createPersistor (store, config) {
     if(process.env.NODE_ENV !== 'production') {
         console.log("Persistor unsubscribing from store");
     }
-    pauseForFlush();
-    flush();
+
     unsubscribe();
+
+    if(process.env.NODE_ENV !== 'production') {
+        console.log("Persistor done unsubscribing from store");
+    }
   }
 
   // return `persistor`
