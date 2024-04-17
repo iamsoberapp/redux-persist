@@ -1,12 +1,12 @@
 {
-  "name": "redux-persist",
+  "name": "redux-persist-legacy",
   "version": "4.10.1",
   "description": "persist and rehydrate redux stores",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
-  "unpkg": "dist/redux-persist.min.js",
+  "unpkg": "dist/redux-persist-legacy.min.js",
   "scripts": {
     "test": "standard 'src/**/*.js' 'test/**/*.js' && BABEL_ENV=commonjs ava --esnext",
     "test:watch": "npm test -- --watch",
@@ -15,8 +15,8 @@
     "build": "npm run build:commonjs && npm run build:es && npm run build:umd && npm run build:umd:min && npm run copy-types",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -i src/index.js -o dist/redux-persist.js",
-    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -i src/index.js -o dist/redux-persist.min.js",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup -c -i src/index.js -o dist/redux-persist-legacy.js",
+    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production rollup -c -i src/index.js -o dist/redux-persist-legacy.min.js",
     "build:watch": "npm run build:commonjs -- -watch",
     "prepare": "npm run build",
     "prepublish": "npm run clean && npm run prepare"

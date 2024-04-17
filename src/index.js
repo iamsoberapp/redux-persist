@@ -7,7 +7,7 @@ import purgeStoredState from './purgeStoredState'
 
 // @TODO remove in v5
 const deprecated = (cb, cb2, cb3) => {
-  console.error('redux-persist: this method of importing storages has been removed. instead use `import { asyncLocalStorage } from "redux-persist/storages"`')
+  console.error('redux-persist-legacy: this method of importing storages has been removed. instead use `import { asyncLocalStorage } from "redux-persist/storages"`')
   if (typeof cb === 'function') cb()
   if (typeof cb2 === 'function') cb2()
   if (typeof cb3 === 'function') cb3()

@@ -6,7 +6,7 @@ declare type Dispatch = Function
 declare type Store = Object
 declare type StoreEnhancer = (next: Function) => Function
 
-// redux-persist typing
+// redux-persist-legacy typing
 type Whitelist = Array<$Subtype<string>>
 type Blacklist = Array<$Subtype<string>>
 

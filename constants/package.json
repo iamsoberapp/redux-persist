@@ -1,5 +1,5 @@
 {
-  "name": "redux-persist/constants",
+  "name": "redux-persist-legacy/constants",
   "private": true,
   "main": "../lib/constants.js",
   "module": "../es/constants.js",

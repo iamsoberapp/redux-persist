@@ -1,4 +1,4 @@
-declare module "redux-persist" {
+declare module "redux-persist-legacy" {
   import { Store, StoreEnhancer } from "redux";
 
   export interface PersistorConfig {
@@ -98,17 +98,17 @@ declare module "redux-persist" {
 
   export function purgeStoredState(persistorConfig?: PersistorConfig, keys?: string[]): Promise<any>;
 
-  import * as storages from "redux-persist/storages";
+  import * as storages from "redux-persist-legacy/storages";
   export { storages };
 }
 
-declare module "redux-persist/constants" {
+declare module "redux-persist-legacy/constants" {
   export const KEY_PREFIX = 'reduxPersist:';
   export const REHYDRATE = 'persist/REHYDRATE';
 }
 
-declare module "redux-persist/storages" {
-  import { AsyncStorage } from "redux-persist";
+declare module "redux-persist-legacy/storages" {
+  import { AsyncStorage } from "redux-persist-legacy";
 
   export const asyncLocalStorage: AsyncStorage;
   export const asyncSessionStorage: AsyncStorage;
