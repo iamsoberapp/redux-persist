@@ -21,7 +21,6 @@ export default function autoRehydrate (config = {}) {
     let preRehydrateActions = []
     return (state, action) => {
       if (action.type !== REHYDRATE) {
-        console.log("redux-persist/autoRehydrate.liftReducer saw non rehydrate action: %s", action);
         if (config.log && !rehydrated) preRehydrateActions.push(action) // store pre-rehydrate actions for debugging
         return reducer(state, action)
       } else {

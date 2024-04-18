@@ -117,6 +117,7 @@ export default function createPersistor (store, config) {
   }
 
   function adhocRehydrate (incoming, options = {}) {
+    console.log("redux-persist/adhocRehydrate");
     let state = {}
     if (options.serial) {
       stateIterator(incoming, (subState, key) => {
