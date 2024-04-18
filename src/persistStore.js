@@ -19,6 +19,8 @@ export default function persistStore (store, config = {}, onComplete) {
   // restore
   if (shouldRestore) {
     setImmediate(() => {
+      console.log("redux-persist/persistStore. setImmediate() fired!");
+
       getStoredState(config, (err, restoredState) => {
         console.log("redux-persist/persistStore.getStoredState err=%s", err);
 

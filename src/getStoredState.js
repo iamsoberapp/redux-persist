@@ -17,21 +17,34 @@ export default function getStoredState (config, onComplete) {
 
   storage.getAllKeys((err, allKeys) => {
     if (err) {
-      if (process.env.NODE_ENV !== 'production') console.warn('redux-persist/getStoredState: Error in storage.getAllKeys')
+      console.log('redux-persist/getStoredState: Error in storage.getAllKeys');
+      console.log(JSON.stringify(err));
       complete(err)
     }
 
+    console.log("getAllKeys: allKeys=%s", JSON.stringify(allKeys));
+
     let persistKeys = allKeys.filter((key) => key.indexOf(keyPrefix) === 0).map((key) => key.slice(keyPrefix.length))
+    console.log("getAllKeys: persistKeys=%s", JSON.stringify(persistKeys));
     let keysToRestore = persistKeys.filter(passWhitelistBlacklist)
+    console.log("getAllKeys: keysToRestore=%s", JSON.stringify(keysToRestore));
 
     let restoreCount = keysToRestore.length
+    console.log("getAllKeys: restoreCount=%s", restoreCount);
     if (restoreCount === 0) complete(null, restoredState)
     keysToRestore.forEach((key) => {
       storage.getItem(createStorageKey(key), (err, serialized) => {
-        if (err && process.env.NODE_ENV !== 'production') console.warn('redux-persist/getStoredState: Error restoring data for key:', key, err)
-        else restoredState[key] = rehydrate(key, serialized)
+        if (err) {
+          console.log('redux-persist/getStoredState: Error restoring data for key:', key, err)
+        } else { 
+          console.log('redux-persist/getStoredState: Calling rehydrate for key: %s', key);
+          restoredState[key] = rehydrate(key, serialized)
+        }
         completionCount += 1
-        if (completionCount === restoreCount) complete(null, restoredState)
+        if (completionCount === restoreCount) {
+          console.log("redux-persist/getStoredState: calling complete()");
+          complete(null, restoredState)
+        };
       })
     })
   })
@@ -45,7 +58,7 @@ export default function getStoredState (config, onComplete) {
         return transformer.out(subState, key)
       }, data)
     } catch (err) {
-      if (process.env.NODE_ENV !== 'production') console.warn('redux-persist/getStoredState: Error restoring data for key:', key, err)
+      console.log('redux-persist/getStoredState: Error restoring data for key:', key, err);
     }
 
     return state
