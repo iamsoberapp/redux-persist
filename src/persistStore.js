@@ -14,18 +14,12 @@ export default function persistStore (store, config = {}, onComplete) {
   // create and pause persistor
   const persistor = createPersistor(store, config)
   persistor.pause()
-  console.log("redux-persist/persistStore. shouldRestore=%s", shouldRestore);
 
   // restore
   if (shouldRestore) {
     setImmediate(() => {
-      console.log("redux-persist/persistStore. setImmediate() fired!");
-
       getStoredState(config, (err, restoredState) => {
-        console.log("redux-persist/persistStore.getStoredState err=%s", err);
-
         if (err) {
-          console.log("redux-persist/persistStore.getStoredState err was non null, bailing early");
           complete(err)
           return
         }
@@ -35,7 +29,6 @@ export default function persistStore (store, config = {}, onComplete) {
           else purgeKeys.forEach((key) => delete restoredState[key])
         }
         try {
-          console.log("redux-persist/persistStore.getStoredState dispatching rehydrate!");
           store.dispatch(rehydrateAction(restoredState, err))
         } finally {
           complete(err, restoredState)

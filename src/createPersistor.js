@@ -117,7 +117,6 @@ export default function createPersistor (store, config) {
   }
 
   function adhocRehydrate (incoming, options = {}) {
-    console.log("redux-persist/adhocRehydrate");
     let state = {}
     if (options.serial) {
       stateIterator(incoming, (subState, key) => {
@@ -142,15 +141,7 @@ export default function createPersistor (store, config) {
   }
 
   function stop() {
-    if(process.env.NODE_ENV !== 'production') {
-        console.log("Persistor unsubscribing from store");
-    }
-
     unsubscribe();
-
-    if(process.env.NODE_ENV !== 'production') {
-        console.log("Persistor done unsubscribing from store");
-    }
   }
 
   // return `persistor`
